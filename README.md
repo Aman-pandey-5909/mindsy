@@ -1,15 +1,4 @@
-Here you go bro — a **clean, professional, internship-grade README.md** that makes your project look polished, intentional, and well-designed (not AI-coded).
-Just paste this into your GitHub repo as:
 
-```
-README.md
-```
-
----
-
-# ⭐ **README.md (FULL + POLISHED)**
-
-```markdown
 # 🧠 MindsY — Mental Health Support Platform  
 A modern, pastel-themed mental health platform built with **React + TailwindCSS**, designed to help users assess their mental well-being, track moods, manage diaries, book appointments, and access professional guidance.
 
