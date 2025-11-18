@@ -1,0 +1,10 @@
+[
+  {
+    "question": "How often do you feel sad?",
+    "options": ["Never", "Sometimes", "Often", "Always"]
+  },
+  {
+    "question": "How well do you sleep at night?",
+    "options": ["Very well", "Well", "Poorly", "Very poorly"]
+  }
+]

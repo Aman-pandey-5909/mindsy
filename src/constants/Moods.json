@@ -1,0 +1,92 @@
+[
+  {
+    "Label": "Happy",
+    "sublabels": [
+      "Happy-Playful",
+      "Happy-Content",
+      "Happy-Interested",
+      "Happy-Proud",
+      "Happy-Accepted",
+      "Happy-Powerful",
+      "Happy-Peaceful",
+      "Happy-Trusting",
+      "Happy-Optimistic"
+    ],
+    "Color": "#FDE68A"
+  },
+  {
+    "Label": "Sad",
+    "sublabels": [
+      "Happy-Playful2",
+      "Happy-Content2",
+      "Happy-Interested2",
+      "Happy-Proud",
+      "Happy-Accepted",
+      "Happy-Powerful",
+      "Happy-Peaceful",
+      "Happy-Trusting",
+      "Happy-Optimistic"
+    ],
+    "Color": "#A5D8FF"
+  },
+  {
+    "Label": "Angry",
+    "sublabels": [
+      "Happy-Playful",
+      "Happy-Content",
+      "Happy-Interested",
+      "Happy-Proud",
+      "Happy-Accepted",
+      "Happy-Powerful",
+      "Happy-Peaceful",
+      "Happy-Trusting",
+      "Happy-Optimistic"
+    ],
+    "Color": "#FFB3B3"
+  },
+  {
+    "Label": "Fearful",
+    "sublabels": [
+      "Happy-Playful",
+      "Happy-Content",
+      "Happy-Interested",
+      "Happy-Proud",
+      "Happy-Accepted",
+      "Happy-Powerful",
+      "Happy-Peaceful",
+      "Happy-Trusting",
+      "Happy-Optimistic"
+    ],
+    "Color": "#D9B8FF"
+  },
+  {
+    "Label": "Bad",
+    "sublabels": [
+      "Happy-Playful",
+      "Happy-Content",
+      "Happy-Interested",
+      "Happy-Proud",
+      "Happy-Accepted",
+      "Happy-Powerful",
+      "Happy-Peaceful",
+      "Happy-Trusting",
+      "Happy-Optimistic"
+    ],
+    "Color": "#D9DBE0"
+  },
+  {
+    "Label": "Disgusted",
+    "sublabels": [
+      "Happy-Playful",
+      "Happy-Content",
+      "Happy-Interested",
+      "Happy-Proud",
+      "Happy-Accepted",
+      "Happy-Powerful",
+      "Happy-Peaceful",
+      "Happy-Trusting",
+      "Happy-Optimistic"
+    ],
+    "Color": "#B9E9C9"
+  }
+]
