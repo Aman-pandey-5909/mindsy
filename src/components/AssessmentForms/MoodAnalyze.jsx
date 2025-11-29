@@ -5,29 +5,54 @@ export default function Page() {
   const data = [
     {
       header: "Happy",
+      color: "#fbbf24",
       categories: [
-        { name: "Playful", children: ["Cheeky", "Silly", "Giddy"] },
-        { name: "Content", children: ["Free", "Joyful", "Satisfied"] },
-        // …
+        {
+          name: "Playful",
+          color: "#f59e0b",
+          children: [
+            { label: "Cheeky", color: "#fcd34d" },
+            { label: "Silly", color: "#fde68a" },
+            { label: "Giddy", color: "#fef3c7" },
+          ],
+        },
+        {
+          name: "Content",
+          color: "#f472b6",
+          children: [
+            { label: "Free", color: "#f9a8d4" },
+            { label: "Joyful", color: "#fbcfe8" },
+            { label: "Satisfied", color: "#fce7f3" },
+          ],
+        },
       ],
     },
     {
       header: "Sad",
+      color: "#60a5fa",
       categories: [
-        { name: "Lonely", children: ["Isolated", "Abandoned"] },
-        { name: "Vulnerable", children: ["Fragile", "Victimized"] },
-        // …
+        {
+          name: "Lonely",
+          color: "#3b82f6",
+          children: [
+            { label: "Isolated", color: "#93c5fd" },
+            { label: "Abandoned", color: "#bfdbfe" },
+          ],
+        },
+        {
+          name: "Vulnerable",
+          color: "#2563eb",
+          children: [
+            { label: "Fragile", color: "#93c5fd" },
+            { label: "Victimized", color: "#bfdbfe" },
+          ],
+        },
       ],
     },
-    {
-      header: "Angry",
-      categories: [
-        { name: "Frustrated", children: ["Annoyed", "Agitated"] },
-        { name: "Bitter", children: ["Resentful", "Jealous"] },
-      ],
-    },
-    // Add unlimited more…
+
+    // etc…
   ];
+
 
   return (
     <div className="p-10 flex justify-center">
@@ -50,12 +75,25 @@ function TripleWheel({ data, size = 420 }) {
   const rad = (deg) => (deg * Math.PI) / 180;
 
   // Build dynamic lists
-  const headers = data.map((h) => h.header);
-  const categories = data.flatMap((h) =>
-    h.categories.map((cat) => cat.name)
+  const headers = data.map(h => ({
+    label: h.header,
+    color: h.color
+  }));
+
+  const categories = data.flatMap(h =>
+    h.categories.map(cat => ({
+      label: cat.name,
+      color: cat.color
+    }))
   );
-  const subcategories = data.flatMap((h) =>
-    h.categories.flatMap((cat) => cat.children)
+
+  const subcategories = data.flatMap(h =>
+    h.categories.flatMap(cat =>
+      cat.children.map(child => ({
+        label: child.label,
+        color: child.color
+      }))
+    )
   );
 
   const drawWheel = () => {
@@ -85,7 +123,7 @@ function TripleWheel({ data, size = 420 }) {
     ctx.restore();
   };
 
-  const drawRing = (ctx, cx, cy, innerR, outerR, items, color) => {
+  const drawRing = (ctx, cx, cy, innerR, outerR, items) => {
     const angle = 360 / items.length;
 
     items.forEach((item, i) => {
@@ -97,8 +135,10 @@ function TripleWheel({ data, size = 420 }) {
       ctx.arc(cx, cy, innerR, end, start, true);
       ctx.closePath();
 
-      ctx.fillStyle =
-        highlight === item ? lighten(color, 0.35) : lighten(color, 0.1);
+      ctx.fillStyle = highlight === item.label
+        ? lighten(item.color, 0.4)
+        : lighten(item.color, 0.1);
+
       ctx.fill();
 
       ctx.strokeStyle = "#fff";
@@ -109,13 +149,14 @@ function TripleWheel({ data, size = 420 }) {
       ctx.save();
       ctx.translate(cx, cy);
       ctx.rotate(start + (end - start) / 2);
-      ctx.textAlign = "center";
       ctx.fillStyle = "#fff";
-      ctx.font = "bold 13px sans-serif";
-      ctx.fillText(item, (innerR + outerR) / 2, 5);
+      ctx.font = "bold 12px sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText(item.label, (innerR + outerR) / 2, 5);
       ctx.restore();
     });
   };
+
 
   const lighten = (color, amt) =>
     color.replace(")", `, ${amt})`).replace("rgb", "rgba");
@@ -142,36 +183,40 @@ function TripleWheel({ data, size = 420 }) {
   const onClick = (e) => {
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
-  
+
     const x = e.clientX - rect.left - size / 2;
     const y = e.clientY - rect.top - size / 2;
-  
+
     const angle = ((Math.atan2(y, x) * 180) / Math.PI + 360 - rotation) % 360;
     const dist = Math.sqrt(x * x + y * y);
-  
+
     // --- FIXED RING DETECTION ---
     let ringIndex = -1;
-  
+
     if (dist >= ringWidth * 0 && dist < ringWidth * 1) ringIndex = 1; // headers
     else if (dist >= ringWidth * 1 && dist < ringWidth * 2) ringIndex = 2; // categories
     else if (dist >= ringWidth * 2 && dist < ringWidth * 3) ringIndex = 3; // subcategories
-  
+
     let ringArr = null;
     if (ringIndex === 1) ringArr = headers;
     if (ringIndex === 2) ringArr = categories;
     if (ringIndex === 3) ringArr = subcategories;
     if (!ringArr) return;
-  
+
     const index = Math.floor((angle / 360) * ringArr.length);
-    const clicked = ringArr[index];
-    setHighlight(clicked);
-  
-    setSelectedItems((prev) => {
-      const exists = prev.indexOf(clicked) !== -1;
-      return exists ? prev.filter((x) => x !== clicked) : [...prev, clicked];
+    const clickedLabel = ringArr[index].label;
+
+    setHighlight(clickedLabel);
+
+    setSelectedItems(prev => {
+      if (prev.includes(clickedLabel)) {
+        return prev.filter(item => item !== clickedLabel);
+      }
+      return [...prev, clickedLabel];
     });
+
   };
-  
+
 
   useEffect(drawWheel, [rotation, highlight]);
 
