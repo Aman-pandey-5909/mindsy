@@ -1,6 +1,7 @@
 import "./App.css";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useUserStore } from "./store/useUserStore";
+import { Toaster } from "react-hot-toast";
 
 import Sidebar from "./components/Navbars/Sidebar";
 import DashboardNavbar from "./components/Navbars/DashboardNavbar";
@@ -104,6 +105,7 @@ function App() {
 
   return (
     <>
+      <Toaster />
       <BrowserRouter>
         <Routes>
           {/* PUBLIC ROUTES */}
@@ -173,25 +175,25 @@ function App() {
           <Route
             path="/dashboard"
             element={
-              <ProtectedRoute>
-                <DashboardRoutes>
+              // <ProtectedRoute>
+              //   <DashboardRoutes>
                   <div className="flex">
                     <Sidebar type="User" menuItems={DashboardRoutesJSON} />
                     <Dashboard />
                   </div>
-                </DashboardRoutes>
-              </ProtectedRoute>
+              //   </DashboardRoutes>
+              // </ProtectedRoute>
             }
           />
 
           <Route
             path="/appointments"
             element={
-              <ProtectedRoute>
-                <GeneralRoutes>
+              // <ProtectedRoute>
+              //   <GeneralRoutes>
                   <FindPsychiatrist />
-                </GeneralRoutes>
-              </ProtectedRoute>
+              //   </GeneralRoutes>
+              // </ProtectedRoute>
             }
           />
 
@@ -207,44 +209,44 @@ function App() {
           <Route
             path="/my-appointments"
             element={
-              <ProtectedRoute>
-                <GeneralRoutes>
+              // <ProtectedRoute>
+              //   <GeneralRoutes>
                   <MyPsychiatrist />
-                </GeneralRoutes>
-              </ProtectedRoute>
+              //   </GeneralRoutes>
+              // </ProtectedRoute>
             }
           />
 
           <Route
             path="/diary"
             element={
-              <ProtectedRoute>
-                <GeneralRoutes>
+              // <ProtectedRoute>
+              //   <GeneralRoutes>
                   <Diary />
-                </GeneralRoutes>
-              </ProtectedRoute>
+              //   </GeneralRoutes>
+              // </ProtectedRoute>
             }
           />
 
           <Route
             path="/feedback"
             element={
-              <ProtectedRoute>
-                <GeneralRoutes>
+              // <ProtectedRoute>
+              //   <GeneralRoutes>
                   <Feedback />
-                </GeneralRoutes>
-              </ProtectedRoute>
+              //   </GeneralRoutes>
+              // </ProtectedRoute>
             }
           />
 
           <Route
             path="/register-psychiatrist"
             element={
-              <ProtectedRoute>
-                <GeneralRoutes>
+              // <ProtectedRoute>
+              //   <GeneralRoutes>
                   <RegisterPsychiatrist />
-                </GeneralRoutes>
-              </ProtectedRoute>
+              //   </GeneralRoutes>
+              // </ProtectedRoute>
             }
           />
 
@@ -252,14 +254,14 @@ function App() {
           <Route
             path="/dashboard/admin"
             element={
-              <ProtectedRouteAdmin>
+              // <ProtectedRouteAdmin>
                 <DashboardRoutes>
                   <div className="flex">
                     <Sidebar type="Admin" menuItems={AdminRoutesJSON} />
                     <AdminOverview />
                   </div>
                 </DashboardRoutes>
-              </ProtectedRouteAdmin>
+              // </ProtectedRouteAdmin>
             }
           />
 
@@ -268,14 +270,14 @@ function App() {
               key={i}
               path={item.path}
               element={
-                <ProtectedRouteAdmin>
+                // <ProtectedRouteAdmin>
                   <DashboardRoutes>
                     <div className="flex">
                       <Sidebar type="Admin" menuItems={AdminRoutesJSON} />
                       {item.component}
                     </div>
                   </DashboardRoutes>
-                </ProtectedRouteAdmin>
+                // </ProtectedRouteAdmin>
               }
             />
           ))}

@@ -1,19 +1,54 @@
-import React, { useState } from "react";
-import { BiMenu, BiMicrophone, BiX } from "react-icons/bi";
+import React, { useState, useEffect, useRef } from "react";
+import { BiMenu, BiMicrophone, BiX, BiSend, BiPlus } from "react-icons/bi";
+import { useChatbot } from "../hooks/useChatbot";
+import { useChatbotStore } from "../store/useChatbotStore";
+import toast from "react-hot-toast";
 
 const Chatbot = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [input, setInput] = useState("");
+  const messages = useChatbotStore((s) => s.messages);
+  const history = useChatbotStore((s) => s.history);
+  const activeChat = useChatbotStore((s) => s.activeChat);
+  const addChatToHistory = useChatbotStore((s) => s.addChatToHistory);
+  const setActiveChat = useChatbotStore((s) => s.setActiveChat);
+  const { mutate, isPending } = useChatbot();
+  const messagesContainerRef = useRef(null);
 
-  const [messages, setMessages] = useState([
-    { from: "bot", text: "Please choose your preferred language." },
-    { from: "bot", text: "What is your concern today? (Stress, Anxiety, Mood…)" },
-    { from: "user", text: "I think I'm feeling overwhelmed lately." },
-    { from: "bot", text: "Thank you for sharing. Can you tell me more about it?" },
-  ]);
+  const handleSend = () => {
+    if (input.trim()) {
+      mutate({ message: input });
+      setInput("");
+    }
+  };
+
+  const handleNewChat = () => {
+    if (messages.length > 1) {
+      addChatToHistory();
+      toast.success("New chat created!");
+    } else {
+      addChatToHistory();
+    }
+  };
+
+  useEffect(() => {
+    if (activeChat) {
+      const chat = history.find((c) => c.id === activeChat);
+      if (chat) {
+        useChatbotStore.setState({ messages: chat.messages });
+      }
+    }
+  }, [activeChat, history]);
+
+  useEffect(() => {
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop =
+        messagesContainerRef.current.scrollHeight;
+    }
+  }, [messages]);
 
   return (
-    <div className="relative w-full h-[90vh] px-4 py-4 flex gap-4 text-text-black">
-
+    <div className="relative w-full h-[90vh] px-4 py-4 flex gap-4 text-text-black bg-background">
       {/* HISTORY SIDEBAR */}
       <div
         className={`fixed top-0 left-0 h-full w-[280px] bg-sidebar shadow-xl p-4 z-20
@@ -29,12 +64,38 @@ const Chatbot = () => {
           <BiX className="text-xl" />
         </button>
 
-        <h2 className="text-xl font-bold mb-4">Chat History</h2>
+        <h2 className="text-xl font-bold mb-4 text-primary">Chat History</h2>
 
-        <div className="flex flex-col gap-3">
-          <div className="p-3 bg-white rounded-md shadow">Chat #1</div>
-          <div className="p-3 bg-white rounded-md shadow">Chat #2</div>
-          <div className="p-3 bg-white rounded-md shadow">Chat #3</div>
+        <button
+          className="flex items-center gap-2 bg-secondary-navbar text-white px-4 py-2 rounded-lg shadow mb-4 w-full"
+          onClick={handleNewChat}
+        >
+          <BiPlus className="text-xl" />
+          New Chat
+        </button>
+
+        <div className="flex flex-col gap-3 overflow-y-auto">
+          {history.map((chat, index) => {
+            const lastMessage = useChatbotStore
+              .getState()
+              .getLastMessage(chat.id);
+            return (
+              <div
+                key={chat.id}
+                className={`p-3 bg-gray-100 rounded-md shadow cursor-pointer transition-colors duration-200 ${
+                  activeChat === chat.id
+                    ? "bg-primary-light border-l-4 border-primary"
+                    : "hover:bg-gray-200"
+                }`}
+                onClick={() => setActiveChat(chat.id)}
+              >
+                <p className="font-bold text-text-primary">Chat #{index + 1}</p>
+                <p className="text-sm truncate text-text-secondary">
+                  {lastMessage ? lastMessage.text : "..."}
+                </p>
+              </div>
+            );
+          })}
         </div>
       </div>
 
@@ -47,44 +108,61 @@ const Chatbot = () => {
       </button>
 
       {/* CHAT MAIN AREA */}
-      <div className="w-full max-w-[750px] mx-auto h-full bg-white rounded-xl shadow-md p-4 flex flex-col">
-        
-        {/* Heading (visible until many msgs) */}
-        {messages.length <= 5 && (
-          <div className="text-center mb-4">
-            <h1 className="text-2xl font-semibold">Mindsy Chatbot</h1>
-            <p className="text-gray-600 text-sm">Your safe space to talk.</p>
-          </div>
-        )}
+      <div className="w-full max-w-[800px] mx-auto h-full bg-white rounded-xl shadow-lg p-6 flex flex-col">
+        {/* Heading */}
+        <div className="text-center mb-6">
+          <h1 className="text-3xl font-bold">Mindsy</h1>
+          <p className="text-sm text-gray-600">Your safe space to talk.</p>
+        </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto flex flex-col gap-4 px-2">
-
+        <div
+          ref={messagesContainerRef}
+          className="flex-1 overflow-y-auto flex flex-col gap-5 px-4"
+        >
           {messages.map((msg, index) => (
             <div
               key={index}
-              className={`max-w-[70%] p-3 rounded-xl shadow text-sm ${
-                msg.from === "user"
-                  ? "ml-auto bg-accent-1 text-text-black"
-                  : "mr-auto bg-[#E6E3DA] text-text-black"
+              className={`max-w-[75%] p-4 rounded-2xl shadow-md text-sm transition-all duration-300 ${
+                msg.sender === "user"
+                  ? "ml-auto bg-accent-1 text-black"
+                  : "mr-auto bg-[#e6e3da] text-text-black"
               }`}
             >
               {msg.text}
             </div>
           ))}
-
+          {isPending && (
+            <div className="mr-auto bg-gray-200 text-text-primary max-w-[75%] p-4 rounded-2xl shadow-md text-sm flex items-center gap-2">
+              <div className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+              <div className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+              <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
+            </div>
+          )}
         </div>
 
         {/* Input bar */}
-        <div className="mt-4 flex items-center gap-2">
+        <div className="mt-6 flex items-center gap-3">
           <input
             type="text"
             placeholder="Type your message..."
-            className="flex-1 bg-assessment-bg px-4 py-2 rounded-xl shadow border outline-none"
+            className="flex-1 bg-assessment-bg px-5 py-3 rounded-full shadow-inner border-transparent focus:outline-none focus:ring-2 focus:ring-primary"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSend()}
           />
 
+          {/* Send button */}
+          <button
+            className="bg-secondary-navbar text-white p-4 rounded-full shadow-lg transition-transform duration-200 hover:scale-110"
+            onClick={handleSend}
+            disabled={isPending}
+          >
+            <BiSend className="text-xl" />
+          </button>
+
           {/* Voice button */}
-          <button className="bg-secondary-navbar text-white p-3 rounded-xl shadow">
+          <button className="bg-secondary-navbar text-white p-4 rounded-full shadow-lg transition-transform duration-200 hover:scale-110">
             <BiMicrophone className="text-xl" />
           </button>
         </div>

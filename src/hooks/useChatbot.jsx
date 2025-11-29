@@ -9,6 +9,8 @@ export const useChatbot = () => {
   return useMutation({
     mutationFn: ({ message }) => sendToBot(message),
     onMutate: ({ message }) => addUser(message),
-    onSuccess: (data) => addBot(data.reply),
+    onSuccess: (data) => {
+      addBot(data.reply);
+    },
   });
 };
