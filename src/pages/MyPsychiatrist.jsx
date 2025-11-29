@@ -1,49 +1,53 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import UserCardComponentMypsy from "../components/Card/UserCardComponentMyPsy";
+import { useAppointment } from "../hooks/useAppointment";
 
 // TEMP mock data (replace with API later)
-const psychiatrists = [
-  {
-    id: 1,
-    name: "Dr. Priya Sharma",
-    exp: "0-4 yrs exp",
-    rating: 4.3,
-    reviews: 200,
-    speciality: "Anxiety, Stress",
-    fee: "Free",
-    status: "Confirmed",
-    buttononclick: () => navigate("/psychiatrist-detail")
-  },
-  {
-    id: 2,
-    name: "Dr. Devika Rathode",
-    exp: "0-4 yrs exp",
-    rating: 4.3,
-    reviews: 200,
-    speciality: "Anxiety, Stress",
-    fee: "₹200 /-",
-    status: "Pending",
-    buttononclick: () => {}
-  },
-];
+// const psychiatrists = [
+//   {
+//     id: 1,
+//     name: "Dr. Priya Sharma",
+//     exp: "0-4 yrs exp",
+//     rating: 4.3,
+//     reviews: 200,
+//     speciality: "Anxiety, Stress",
+//     fee: "Free",
+//     status: "Confirmed",
+//     buttononclick: () => navigate("/psychiatrist-detail")
+//   },
+//   {
+//     id: 2,
+//     name: "Dr. Devika Rathode",
+//     exp: "0-4 yrs exp",
+//     rating: 4.3,
+//     reviews: 200,
+//     speciality: "Anxiety, Stress",
+//     fee: "₹200 /-",
+//     status: "Pending",
+//     buttononclick: () => {}
+//   },
+// ];
 
 const MyPsychiatrist = () => {
   const navigate = useNavigate();
   const [sortType, setSortType] = useState("all");
   const [query, setQuery] = useState("");
+  const { data: appointments, isLoading } = useAppointment();
 
-  const filteredData = psychiatrists.filter((psy) => {
-    const matchesQuery = psy.name.toLowerCase().includes(query.toLowerCase());
-    const matchesSort =
-      sortType === "free"
-        ? psy.fee.toLowerCase().includes("free")
-        : sortType === "paid"
-        ? !psy.fee.toLowerCase().includes("free")
-        : true;
+  const filteredData = appointments
+    ? appointments.filter((psy) => {
+        const matchesQuery = psy.name.toLowerCase().includes(query.toLowerCase());
+        const matchesSort =
+          sortType === "free"
+            ? psy.fee.toLowerCase().includes("free")
+            : sortType === "paid"
+            ? !psy.fee.toLowerCase().includes("free")
+            : true;
 
-    return matchesQuery && matchesSort;
-  });
+        return matchesQuery && matchesSort;
+      })
+    : [];
 
   return (
     <div className="w-full flex justify-center">
@@ -91,9 +95,15 @@ const MyPsychiatrist = () => {
 
         {/* LIST OF PSYCHIATRISTS */}
         <div className="flex flex-col gap-4 pb-10">
-          {filteredData.map((psy) => (
-            <UserCardComponentMypsy key={psy.id} data={psy} />
-          ))}
+          {isLoading ? (
+            <p>Loading...</p>
+          ) : filteredData.length > 0 ? (
+            filteredData.map((psy) => (
+              <UserCardComponentMypsy key={psy.id} data={psy} />
+            ))
+          ) : (
+            <p>No appointments found.</p>
+          )}
         </div>
       </div>
     </div>

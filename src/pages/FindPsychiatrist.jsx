@@ -1,45 +1,49 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import UserCardComponent from "../components/Card/UserCardComponent";
+import { usePsychiatrists } from "../hooks/usePsychiatrists";
 
 // TEMP mock data (replace with API later)
-const psychiatrists = [
-  {
-    id: 1,
-    name: "Dr. Priya Sharma",
-    exp: "0-4 yrs exp",
-    rating: 4.3,
-    reviews: 200,
-    speciality: "Anxiety, Stress",
-    fee: "Free",
-  },
-  {
-    id: 2,
-    name: "Dr. Devika Rathode",
-    exp: "0-4 yrs exp",
-    rating: 4.3,
-    reviews: 200,
-    speciality: "Anxiety, Stress",
-    fee: "₹200 /-",
-  },
-];
+// const psychiatrists = [
+//   {
+//     id: 1,
+//     name: "Dr. Priya Sharma",
+//     exp: "0-4 yrs exp",
+//     rating: 4.3,
+//     reviews: 200,
+//     speciality: "Anxiety, Stress",
+//     fee: "Free",
+//   },
+//   {
+//     id: 2,
+//     name: "Dr. Devika Rathode",
+//     exp: "0-4 yrs exp",
+//     rating: 4.3,
+//     reviews: 200,
+//     speciality: "Anxiety, Stress",
+//     fee: "₹200 /-",
+//   },
+// ];
 
 const FindPsychiatrist = () => {
   const navigate = useNavigate();
   const [sortType, setSortType] = useState("all");
   const [query, setQuery] = useState("");
+  const { data: psychiatrists, isLoading } = usePsychiatrists();
 
-  const filteredData = psychiatrists.filter((psy) => {
-    const matchesQuery = psy.name.toLowerCase().includes(query.toLowerCase());
-    const matchesSort =
-      sortType === "free"
-        ? psy.fee.toLowerCase().includes("free")
-        : sortType === "paid"
-        ? !psy.fee.toLowerCase().includes("free")
-        : true;
+  const filteredData = psychiatrists
+    ? psychiatrists.filter((psy) => {
+        const matchesQuery = psy.name.toLowerCase().includes(query.toLowerCase());
+        const matchesSort =
+          sortType === "free"
+            ? psy.fee.toLowerCase().includes("free")
+            : sortType === "paid"
+            ? !psy.fee.toLowerCase().includes("free")
+            : true;
 
-    return matchesQuery && matchesSort;
-  });
+        return matchesQuery && matchesSort;
+      })
+    : [];
 
   return (
     <div className="w-full flex justify-center">
@@ -87,25 +91,29 @@ const FindPsychiatrist = () => {
 
         {/* LIST OF PSYCHIATRISTS */}
         <div className="flex flex-col gap-4 pb-10">
-          {filteredData.map((psy) => (
-            <UserCardComponent
-              key={psy.id}
-              type="psychiatrist"
-              data={psy}
-              buttons={[
-                {
-                  label: "Book Appointment",
-                  variant: "primary",
-                  onClick: () => navigate(`/book/${psy.id}`),
-                },
-                {
-                  label: "View Details",
-                  variant: "ghost",
-                  onClick: () => navigate(`/psychiatrist/${psy.id}`),
-                },
-              ]}
-            />
-          ))}
+          {isLoading ? (
+            <p>Loading...</p>
+          ) : (
+            filteredData.map((psy) => (
+              <UserCardComponent
+                key={psy.id}
+                type="psychiatrist"
+                data={psy}
+                buttons={[
+                  {
+                    label: "Book Appointment",
+                    variant: "primary",
+                    onClick: () => navigate(`/book/${psy.id}`),
+                  },
+                  {
+                    label: "View Details",
+                    variant: "ghost",
+                    onClick: () => navigate(`/psychiatrist/${psy.id}`),
+                  },
+                ]}
+              />
+            ))
+          )}
         </div>
       </div>
     </div>

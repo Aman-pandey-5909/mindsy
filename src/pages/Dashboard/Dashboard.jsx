@@ -1,13 +1,17 @@
 import React from "react";
 import { useUserStore } from "../../store/useUserStore";
 import UserCardComponent from "../../components/Card/UserCardComponent";
+import { useAppointment } from "../../hooks/useAppointment";
+import { useDiary } from "../../hooks/useDiary";
 
 const Dashboard = () => {
   const { user } = useUserStore((s) => s);
+  const { data: appointments } = useAppointment();
+  const { data: diaries } = useDiary();
 
   // temporary mock values (replace when backend ready)
-  const totalAppointments = 3;
-  const totalDiaries = 12;
+  const totalAppointments = appointments?.length ?? 0;
+  const totalDiaries = diaries?.length ?? 0;
 
   return (
     <div className="p-6 my-10 text-text-black">

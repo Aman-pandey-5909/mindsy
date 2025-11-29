@@ -1,9 +1,58 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useLogin, useRegister } from "../../hooks/useUser";
+import toast from "react-hot-toast";
 
 const Auth = () => {
   const navigate = useNavigate();
   const [mode, setMode] = useState("login"); // "login" or "signup"
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+
+  const { mutate: login, isPending: isLoggingIn } = useLogin();
+  const { mutate: register, isPending: isRegistering } = useRegister();
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (mode === "login") {
+      login(
+        { email: formData.email, password: formData.password },
+        {
+          onSuccess: () => {
+            toast.success("Logged in successfully");
+            navigate("/dashboard");
+          },
+          onError: (err) => {
+            toast.error(err.message);
+          },
+        }
+      );
+    } else {
+      if (formData.password !== formData.confirmPassword) {
+        return toast.error("Passwords do not match");
+      }
+      register(
+        { name: formData.name, email: formData.email, password: formData.password },
+        {
+          onSuccess: () => {
+            toast.success("Registered successfully");
+            navigate("/dashboard");
+          },
+          onError: (err) => {
+            toast.error(err.message);
+          },
+        }
+      );
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
@@ -41,39 +90,47 @@ const Auth = () => {
         </h2>
 
         {/* FORM */}
-        <form className="flex flex-col gap-4">
+        <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
 
           {/* Name (Signup Only) */}
           {mode === "signup" && (
             <input
               type="text"
+              name="name"
               placeholder="Full Name"
               className="w-full px-4 py-3 bg-white border rounded-lg shadow-sm focus:outline-none"
               required
+              onChange={handleChange}
             />
           )}
 
           <input
             type="email"
+            name="email"
             placeholder="Email"
             className="w-full px-4 py-3 bg-white border rounded-lg shadow-sm focus:outline-none"
             required
+            onChange={handleChange}
           />
 
           <input
             type="password"
+            name="password"
             placeholder="Password"
             className="w-full px-4 py-3 bg-white border rounded-lg shadow-sm focus:outline-none"
             required
+            onChange={handleChange}
           />
 
           {/* Confirm password (Signup Only) */}
           {mode === "signup" && (
             <input
               type="password"
+              name="confirmPassword"
               placeholder="Confirm Password"
               className="w-full px-4 py-3 bg-white border rounded-lg shadow-sm focus:outline-none"
               required
+              onChange={handleChange}
             />
           )}
 
@@ -81,8 +138,13 @@ const Auth = () => {
           <button
             type="submit"
             className="mt-2 bg-navbar py-3 rounded-xl text-text-black font-semibold hover:scale-[1.02] transition"
+            disabled={isLoggingIn || isRegistering}
           >
-            {mode === "login" ? "Login" : "Signup"}
+            {isLoggingIn || isRegistering
+              ? "Loading..."
+              : mode === "login"
+              ? "Login"
+              : "Signup"}
           </button>
         </form>
 

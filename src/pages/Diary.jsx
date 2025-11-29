@@ -2,9 +2,11 @@ import React, { useState, useEffect } from "react";
 import { useDiaryStore } from "../store/useDiaryStore";
 import UserCardComponent from "../components/Card/UserCardComponent";
 import { AiOutlineCalendar } from "react-icons/ai";
+import { useDiary, useCreateDiary } from "../hooks/useDiary";
 
 const Diary = () => {
-  const { entries, addEntry, updateEntry } = useDiaryStore();
+  const { data: entries } = useDiary();
+  const { mutate } = useCreateDiary();
 
   const today = new Date().toISOString().split("T")[0];
   const [selectedDate, setSelectedDate] = useState(today);
@@ -12,8 +14,10 @@ const Diary = () => {
 
   // Load entry for selected date
   useEffect(() => {
-    const found = entries.find((e) => e.date === selectedDate);
-    setCurrentEntry(found ? found.text : "");
+    if (entries) {
+      const found = entries.find((e) => e.date === selectedDate);
+      setCurrentEntry(found ? found.text : "");
+    }
   }, [selectedDate, entries]);
 
   const isEditable = selectedDate === today;
@@ -21,17 +25,14 @@ const Diary = () => {
   const handleSave = () => {
     if (!currentEntry.trim()) return;
 
-    if (entries.some((e) => e.date === selectedDate)) {
-      updateEntry(selectedDate, currentEntry);
-    } else {
-      addEntry({ date: selectedDate, text: currentEntry });
-    }
+    mutate({ date: selectedDate, text: currentEntry });
   };
 
   // Previous Entries (exclude today)
-  const previousEntries = entries
-    .filter((e) => e.date !== today)
-    .sort((a, b) => (a.date < b.date ? 1 : -1));
+  const previousEntries =
+    entries
+      ?.filter((e) => e.date !== today)
+      .sort((a, b) => (a.date < b.date ? 1 : -1)) ?? [];
 
   return (
     <div className="w-[750px] mx-auto mt-10 text-text-black">
