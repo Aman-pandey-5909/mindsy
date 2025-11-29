@@ -1,6 +1,7 @@
 import "./App.css";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useUserStore } from "./store/useUserStore";
+import { Toaster } from "react-hot-toast";
 
 import Sidebar from "./components/Navbars/Sidebar";
 import DashboardNavbar from "./components/Navbars/DashboardNavbar";
@@ -29,6 +30,7 @@ import AdminFeedback from "./components/Admin/Feedback";
 import AdminDonations from "./components/Admin/Donations";
 import SupportUs from "./pages/SupportUs";
 import AboutUs from "./pages/Aboutus";
+import BookAppointment from "./pages/BookAppointment";
 
 const AssessmentRoutes = ({ children }) => (
   <>
@@ -104,6 +106,7 @@ function App() {
 
   return (
     <>
+      <Toaster />
       <BrowserRouter>
         <Routes>
           {/* PUBLIC ROUTES */}
@@ -243,6 +246,17 @@ function App() {
               <ProtectedRoute>
                 <GeneralRoutes>
                   <RegisterPsychiatrist />
+                </GeneralRoutes>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/book/:id"
+            element={
+              <ProtectedRoute>
+                <GeneralRoutes>
+                  <BookAppointment />
                 </GeneralRoutes>
               </ProtectedRoute>
             }
